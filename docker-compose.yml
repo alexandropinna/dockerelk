@@ -15,8 +15,9 @@ services:
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
     init: true
+    container_name: setup
     volumes:
-      - setup:/state:Z
+      - ./setup/state:/state:Z
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
       LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
@@ -31,9 +32,11 @@ services:
       context: elasticsearch/
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
+    container_name: elasticsearch
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
-      - elasticsearch:/usr/share/elasticsearch/data:z
+      #- elasticsearch:/usr/share/elasticsearch/data:z
+      - ./elasticsearch/files:/usr/share/elasticsearch:z
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -54,6 +57,7 @@ services:
       context: logstash/
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
+    container_name: logstash
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
@@ -75,6 +79,7 @@ services:
       context: kibana/
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
+    container_name: kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
     ports:
@@ -90,6 +95,3 @@ networks:
   urge-network:
    external: true 
 
-volumes:
-  setup:
-  elasticsearch:
